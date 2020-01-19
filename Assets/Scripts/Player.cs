@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    public static Player instance; //singleton to manage pushback
+
     public float moveSpeed;
     public Rigidbody2D theRB; //in Inspector Drag Player unto this (rigidbody)
     public float jumpForce;
@@ -16,7 +18,15 @@ public class Player : MonoBehaviour
     private bool canDoubleJump;
 
     private Animator anim;
-    private SpriteRenderer theSR; //to enable us to flip the character 
+    private SpriteRenderer theSR; //to enable us to flip the character
+
+    public float knockBackLength, knockBackForce; // push back when damage
+    private float knockBackCounter;
+
+    private void Awake()
+    {
+        instance = this;
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -28,42 +38,68 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //getaxisraw returns flat input
-        theRB.velocity = new Vector2(moveSpeed * Input.GetAxis("Horizontal"), theRB.velocity.y);
-
-        isGrounded = Physics2D.OverlapCircle(groundCheckPoint.position, .2f, whatIsGround);
-        if (isGrounded){ canDoubleJump = true; }
-
-        // Jump
-        if (Input.GetButtonDown("Jump"))
+        //only give user control when we are not "knocking back damage"
+        if (knockBackCounter <= 0)
         {
-            if(isGrounded)
+
+            //getaxisraw returns flat input
+            theRB.velocity = new Vector2(moveSpeed * Input.GetAxis("Horizontal"), theRB.velocity.y);
+
+            isGrounded = Physics2D.OverlapCircle(groundCheckPoint.position, .2f, whatIsGround);
+            if (isGrounded) { canDoubleJump = true; }
+
+            // Jump
+            if (Input.GetButtonDown("Jump"))
             {
-                theRB.velocity = new Vector2(theRB.velocity.x, jumpForce);
+                if (isGrounded)
+                {
+                    theRB.velocity = new Vector2(theRB.velocity.x, jumpForce);
+                }
+                else
+                {
+                    if (canDoubleJump)
+                    {
+                        theRB.velocity = new Vector2(theRB.velocity.x, jumpForce);
+                        canDoubleJump = false;
+                    }
+                }
+
+            }
+
+            if (theRB.velocity.x < 0)
+            {
+                theSR.flipX = true; // Flip character when running left
+            }
+            else if (theRB.velocity.x > 0)
+            {
+                theSR.flipX = false; // Flip character when running right
+            }
+
+        }
+        else
+        {
+            knockBackCounter -= Time.deltaTime;
+            if(!theSR.flipX)
+            {
+                //we're facing right, push back to left
+                theRB.velocity = new Vector2(-knockBackForce, theRB.velocity.y);
             }
             else
             {
-                if(canDoubleJump)
-                {
-                    theRB.velocity = new Vector2(theRB.velocity.x, jumpForce);
-                    canDoubleJump = false;
-                }
+                theRB.velocity = new Vector2(knockBackForce, theRB.velocity.y);
+
             }
-
-        }
-
-        if(theRB.velocity.x < 0)
-        {
-            theSR.flipX = true; // Flip character when running left
-        }
-        else if(theRB.velocity.x > 0)
-        {
-            theSR.flipX = false; // Flip character when running right
         }
 
         // Get Animations accordingly
         anim.SetBool("isGrounded", isGrounded); // set Animator variable to animate jump!
         anim.SetFloat("moveSpeed", Mathf.Abs(theRB.velocity.x));
+    }
 
+    public void KnockBack()
+    {
+        knockBackCounter = knockBackLength;
+        theRB.velocity = new Vector2(0, knockBackForce);
+        anim.SetTrigger("isHurt");
     }
 }

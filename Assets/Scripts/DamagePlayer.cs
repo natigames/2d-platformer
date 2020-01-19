@@ -21,8 +21,8 @@ public class DamagePlayer : MonoBehaviour
         if (other.tag == "Player")
         {
             //hit
-            FindObjectOfType<PlayerHealth>().DealDamage();
-
+            //FindObjectOfType<PlayerHealth>().DealDamage();
+            PlayerHealth.instance.DealDamage(); // better approach with Singleton
         }
     }
 
