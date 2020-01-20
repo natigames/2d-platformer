@@ -51,7 +51,10 @@ public class PlayerHealth : MonoBehaviour
             if (currentHealth <= 0)
             {
                 currentHealth = 0; //prevent weird errors if <0
-                gameObject.SetActive(false);
+
+                //gameObject.SetActive(false);
+                //now control with level manager
+                LevelManager.instance.RespawnPlayer();
             }
             else
             {
