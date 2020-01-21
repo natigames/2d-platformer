@@ -23,6 +23,8 @@ public class Player : MonoBehaviour
     public float knockBackLength, knockBackForce; // push back when damage
     private float knockBackCounter;
 
+    public float bounceForce;
+
     private void Awake()
     {
         instance = this;
@@ -101,5 +103,10 @@ public class Player : MonoBehaviour
         knockBackCounter = knockBackLength;
         theRB.velocity = new Vector2(0, knockBackForce);
         anim.SetTrigger("isHurt");
+    }
+
+    public void Bounce()
+    {
+        theRB.velocity = new Vector2(theRB.velocity.x, bounceForce);
     }
 }
