@@ -15,6 +15,8 @@ public class PlayerHealth : MonoBehaviour
 
     private SpriteRenderer theSR;
 
+    public GameObject deathFX;
+
 
     private void Awake()
     {
@@ -54,6 +56,8 @@ public class PlayerHealth : MonoBehaviour
 
                 //gameObject.SetActive(false);
                 //now control with level manager
+
+                Instantiate(deathFX, transform.position, transform.rotation);
                 LevelManager.instance.RespawnPlayer();
             }
             else
@@ -67,6 +71,17 @@ public class PlayerHealth : MonoBehaviour
 
             UIController.instance.UpdateHealthDisplay();
         }
+    }
+
+
+    public void HealPlayer()
+    {
+        currentHealth++;
+        if (currentHealth > maxhealth)
+        {
+            currentHealth = maxhealth;
+        }
+        UIController.instance.UpdateHealthDisplay();
     }
 
 
