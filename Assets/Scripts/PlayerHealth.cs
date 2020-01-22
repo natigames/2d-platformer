@@ -58,6 +58,8 @@ public class PlayerHealth : MonoBehaviour
                 //now control with level manager
 
                 Instantiate(deathFX, transform.position, transform.rotation);
+                AudioManager.instance.PlaySFX(8);
+
                 LevelManager.instance.RespawnPlayer();
             }
             else
@@ -66,6 +68,7 @@ public class PlayerHealth : MonoBehaviour
                 //blink with alpha to show damage
                 theSR.color = new Color(theSR.color.r, theSR.color.g, theSR.color.b, 0.5f);
 
+                AudioManager.instance.PlaySFX(9);
                 Player.instance.KnockBack(); //call player singleton
             }
 

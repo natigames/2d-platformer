@@ -40,62 +40,68 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //only give user control when we are not "knocking back damage"
-        if (knockBackCounter <= 0)
-        {
 
-            //getaxisraw returns flat input
-            theRB.velocity = new Vector2(moveSpeed * Input.GetAxis("Horizontal"), theRB.velocity.y);
-
-            isGrounded = Physics2D.OverlapCircle(groundCheckPoint.position, .2f, whatIsGround);
-            if (isGrounded) { canDoubleJump = true; }
-
-            // Jump
-            if (Input.GetButtonDown("Jump"))
+        if (!PauseMenu.instance.isPaused)
+        { 
+            //only give user control when we are not "knocking back damage"
+            if (knockBackCounter <= 0)
             {
-                if (isGrounded)
+
+                //getaxisraw returns flat input
+                theRB.velocity = new Vector2(moveSpeed * Input.GetAxis("Horizontal"), theRB.velocity.y);
+
+                isGrounded = Physics2D.OverlapCircle(groundCheckPoint.position, .2f, whatIsGround);
+                if (isGrounded) { canDoubleJump = true; }
+
+                // Jump
+                if (Input.GetButtonDown("Jump"))
                 {
-                    theRB.velocity = new Vector2(theRB.velocity.x, jumpForce);
-                }
-                else
-                {
-                    if (canDoubleJump)
+                    if (isGrounded)
                     {
                         theRB.velocity = new Vector2(theRB.velocity.x, jumpForce);
-                        canDoubleJump = false;
+                        AudioManager.instance.PlaySFX(10);
                     }
+                    else
+                    {
+                        if (canDoubleJump)
+                        {
+                            theRB.velocity = new Vector2(theRB.velocity.x, jumpForce);
+                            canDoubleJump = false;
+                            AudioManager.instance.PlaySFX(10);
+                        }
+                    }
+
                 }
 
-            }
+                if (theRB.velocity.x < 0)
+                {
+                    theSR.flipX = true; // Flip character when running left
+                }
+                else if (theRB.velocity.x > 0)
+                {
+                    theSR.flipX = false; // Flip character when running right
+                }
 
-            if (theRB.velocity.x < 0)
-            {
-                theSR.flipX = true; // Flip character when running left
-            }
-            else if (theRB.velocity.x > 0)
-            {
-                theSR.flipX = false; // Flip character when running right
-            }
-
-        }
-        else
-        {
-            knockBackCounter -= Time.deltaTime;
-            if(!theSR.flipX)
-            {
-                //we're facing right, push back to left
-                theRB.velocity = new Vector2(-knockBackForce, theRB.velocity.y);
             }
             else
             {
-                theRB.velocity = new Vector2(knockBackForce, theRB.velocity.y);
+                knockBackCounter -= Time.deltaTime;
+                if (!theSR.flipX)
+                {
+                    //we're facing right, push back to left
+                    theRB.velocity = new Vector2(-knockBackForce, theRB.velocity.y);
+                }
+                else
+                {
+                    theRB.velocity = new Vector2(knockBackForce, theRB.velocity.y);
 
+                }
             }
-        }
 
-        // Get Animations accordingly
-        anim.SetBool("isGrounded", isGrounded); // set Animator variable to animate jump!
-        anim.SetFloat("moveSpeed", Mathf.Abs(theRB.velocity.x));
+            // Get Animations accordingly
+            anim.SetBool("isGrounded", isGrounded); // set Animator variable to animate jump!
+            anim.SetFloat("moveSpeed", Mathf.Abs(theRB.velocity.x));
+        }
     }
 
     public void KnockBack()
@@ -108,5 +114,6 @@ public class Player : MonoBehaviour
     public void Bounce()
     {
         theRB.velocity = new Vector2(theRB.velocity.x, bounceForce);
+        AudioManager.instance.PlaySFX(10);
     }
 }

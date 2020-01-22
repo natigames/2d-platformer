@@ -23,6 +23,8 @@ public class DamagePlayer : MonoBehaviour
             //hit
             //FindObjectOfType<PlayerHealth>().DealDamage();
             PlayerHealth.instance.DealDamage(); // better approach with Singleton
+
+            AudioManager.instance.PlaySFX(9);
         }
     }
 
