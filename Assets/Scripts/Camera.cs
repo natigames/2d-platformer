@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Camera : MonoBehaviour
 {
+    public static Camera instance;
+
     public Transform target; // to focus on the player
     public Transform farBackground, middleBackground; // for Parallax effect
 
@@ -11,6 +13,13 @@ public class Camera : MonoBehaviour
      
     //private float lastXPos;
     private Vector2 lastPos;
+
+    public bool stopFollow;
+
+    private void Awake()
+    {
+        instance = this;
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -22,6 +31,9 @@ public class Camera : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+        if (!stopFollow)
+        { 
         // follow target on X, clamped on Y, same on Z)
         transform.position = new Vector3(target.position.x, Mathf.Clamp(target.position.y,minHeight,maxHeight), transform.position.z);
 
@@ -36,6 +48,6 @@ public class Camera : MonoBehaviour
 
         //update position
         lastPos = transform.position;
-
+        }
     }
 }
